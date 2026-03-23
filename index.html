@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buku Tamu – Jauhar & Nita</title>
+  <link rel="icon" type="image/png" href="https://ik.imagekit.io/ljqggx4fn/nikah/favicon.png"> <!-- ← tambah ini -->
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────────── */
+    :root {
+      --crimson:    #3F1211;
+      --cream:      #DCCEBE;
+      --cream-light:#EDE5D8;
+      --cream-dark: #C9B8A3;
+      --gold:       #B8986A;
+      --gold-light: #D4B98A;
+      --white:      #FAF7F3;
+      --text-dark:  #2A1010;
+      --text-mid:   #5C3D3D;
+      --text-light: #8B6B6B;
+      --shadow:     rgba(63,18,17,0.15);
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--white);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── Background ornament ───────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 0%,   rgba(220,206,190,0.45) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 90% 100%,  rgba(63,18,17,0.08)   0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 20%,   rgba(184,152,106,0.12) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Decorative SVG pattern overlay ───────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233F1211' fill-opacity='0.025'%3E%3Cpath d='M30 0 L32 28 L60 30 L32 32 L30 60 L28 32 L0 30 L28 28Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Wrapper ───────────────────────────────────────────── */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      padding: 56px 20px 36px;
+    }
+
+    .header-ornament {
+      font-family: 'Great Vibes', cursive;
+      color: var(--gold);
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      opacity: 0.85;
+    }
+
+    .header-names {
+      font-family: 'Great Vibes', cursive;
+      color: var(--crimson);
+      font-size: clamp(2.8rem, 8vw, 4.6rem);
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 16px rgba(63,18,17,0.12);
+    }
+
+    .header-names span {
+      display: block;
+      font-family: 'Great Vibes', cursive;
+      color: var(--gold);
+      font-size: 0.55em;
+      letter-spacing: 0.12em;
+    }
+
+    .header-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px auto;
+    }
+
+    .header-divider::before,
+    .header-divider::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .header-divider::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+
+    .divider-diamond {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    .header-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--text-mid);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 300;
+      margin-top: 4px;
+    }
+
+    /* ─── Tab Nav ───────────────────────────────────────────── */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 5px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 18px var(--shadow);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 13px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: all .3s ease;
+      background: transparent;
+      color: var(--text-mid);
+    }
+
+    .tab-btn.active {
+      background: var(--crimson);
+      color: var(--cream-light);
+      box-shadow: 0 4px 14px rgba(63,18,17,0.28);
+    }
+
+    .tab-btn:not(.active):hover {
+      background: rgba(63,18,17,0.07);
+    }
+
+    /* ─── Card ──────────────────────────────────────────────── */
+    .card {
+      background: rgba(255,252,248,0.92);
+      border-radius: 20px;
+      padding: clamp(28px, 5vw, 44px);
+      box-shadow: 0 8px 40px var(--shadow), 0 1px 0 rgba(255,255,255,0.8) inset;
+      border: 1px solid rgba(220,206,190,0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.3rem, 4vw, 1.7rem);
+      font-weight: 600;
+      color: var(--crimson);
+      margin-bottom: 6px;
+    }
+
+    .section-sub {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 28px;
+      font-weight: 300;
+    }
+
+    /* ─── Form ──────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+    }
+
+    label .optional {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text-light);
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+
+    input, select, textarea {
+      padding: 12px 15px;
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.93rem;
+      color: var(--text-dark);
+      background: var(--white);
+      transition: border-color .25s, box-shadow .25s;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 3px rgba(63,18,17,0.08);
+    }
+
+    input::placeholder { color: var(--cream-dark); }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235C3D3D' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+
+    /* ─── Submit Button ─────────────────────────────────────── */
+    .btn-submit {
+      width: 100%;
+      margin-top: 24px;
+      padding: 15px 30px;
+      background: linear-gradient(135deg, var(--crimson) 0%, #6B2120 100%);
+      color: var(--cream-light);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s ease;
+      box-shadow: 0 5px 20px rgba(63,18,17,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(63,18,17,0.38);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ─── Alert / Toast ─────────────────────────────────────── */
+    .alert {
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      margin-top: 16px;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert.success { background: #F0EBE3; color: var(--crimson); border: 1px solid var(--gold-light); }
+    .alert.error   { background: #FDE8E8; color: #8B1A1A; border: 1px solid #F5C6C6; }
+
+    /* ─── Search bar ────────────────────────────────────────── */
+    .search-wrap {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .search-wrap input {
+      flex: 1;
+    }
+
+    .btn-search {
+      padding: 12px 22px;
+      background: var(--crimson);
+      color: var(--cream-light);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+    .btn-search:hover { opacity: 0.88; }
+
+    /* ─── Stats chips ───────────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .stat-chip {
+      background: var(--cream);
+      border-radius: 30px;
+      padding: 7px 18px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-mid);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-chip .count {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--crimson);
+    }
+
+    /* ─── Table ─────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--cream-dark);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+
+    thead tr {
+      background: var(--crimson);
+      color: var(--cream-light);
+    }
+
+    thead th {
+      padding: 13px 14px;
+      text-align: left;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(220,206,190,0.5);
+      transition: background .18s;
+    }
+
+    tbody tr:hover { background: rgba(220,206,190,0.18); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 12px 14px;
+      color: var(--text-dark);
+      vertical-align: middle;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .badge.unclaimed {
+      background: rgba(63,18,17,0.08);
+      color: var(--crimson);
+      border: 1px solid rgba(63,18,17,0.2);
+    }
+
+    .badge.claimed {
+      background: rgba(73,160,90,0.12);
+      color: #2D6B3A;
+      border: 1px solid rgba(73,160,90,0.3);
+    }
+
+    .btn-claim {
+      padding: 5px 13px;
+      background: var(--gold);
+      color: var(--white);
+      border: none;
+      border-radius: 7px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-claim:hover { opacity: 0.82; }
+    .btn-claim:disabled { opacity: 0.35; cursor: default; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+    }
+
+    /* ─── Floating ornaments ────────────────────────────────── */
+    .ornament-left,
+    .ornament-right {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Great Vibes', cursive;
+      color: rgba(63,18,17,0.04);
+      font-size: clamp(5rem, 12vw, 9rem);
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+      line-height: 1;
+    }
+    .ornament-left  { left: -20px; }
+    .ornament-right { right: -20px; transform: translateY(-50%) scaleX(-1); }
+
+    /* ─── Footer ────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 28px;
+      border-top: 1px solid rgba(220,206,190,0.6);
+    }
+
+    .footer-script {
+      font-family: 'Great Vibes', cursive;
+      color: var(--gold);
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+
+    .footer-text {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── Loading spinner ───────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: var(--cream-light);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Tab content ───────────────────────────────────────── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ─── Animation ─────────────────────────────────────────── */
+    .fade-in {
+      animation: fadeIn .5s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 560px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .stats-row { gap: 8px; }
+    }
+
+    /* ─── Toast Notification ─────────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--white);
+      min-width: 280px;
+      max-width: 360px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      pointer-events: all;
+      animation: toastIn .35s cubic-bezier(.21,1.02,.73,1) forwards;
+    }
+
+    .toast.hide {
+      animation: toastOut .3s ease forwards;
+    }
+
+    .toast.success { background: linear-gradient(135deg, #3F1211, #6B2120); border-left: 4px solid var(--gold); }
+    .toast.error   { background: linear-gradient(135deg, #7B1A1A, #A02020); border-left: 4px solid #F5A0A0; }
+
+    .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
+    .toast-msg  { flex: 1; line-height: 1.4; }
+    .toast-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0;
+      flex-shrink: 0;
+      transition: color .2s;
+    }
+    .toast-close:hover { color: white; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px) scale(.95); }
+      to   { opacity: 1; transform: translateX(0)   scale(1);    }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0)   scale(1);    }
+      to   { opacity: 0; transform: translateX(40px) scale(.95); }
+    }
+
+    @media (max-width: 480px) {
+      .toast-container { top: 16px; right: 12px; left: 12px; }
+      .toast { min-width: unset; max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ornament-left">J&amp;N</div>
+<div class="toast-container" id="toast-container"></div>
+<div class="ornament-right">J&amp;N</div>
+
+<div class="wrapper">
+
+  <!-- ── HEADER ──────────────────────────────────────────────── -->
+  <header class="fade-in">
+    <div class="header-ornament">✦ Selamat Datang di ✦</div>
+    <div class="header-names">
+      Jauhar &amp; Nita
+      <span>Buku Tamu Pernikahan</span>
+    </div>
+    <div class="header-divider"><div class="divider-diamond"></div></div>
+    <div class="header-date">03 April 2026 &nbsp;·&nbsp; UTC Trawas</div>
+  </header>
+
+  <!-- ── TABS ────────────────────────────────────────────────── -->
+  <nav class="tab-nav fade-in">
+    <button class="tab-btn active" onclick="switchTab('buku-tamu')">📖 Buku Tamu</button>
+    <button class="tab-btn"        onclick="switchTab('klaim-souvenir')">🎁 Klaim Souvenir</button>
+  </nav>
+
+  <!-- ── TAB 1: BUKU TAMU ────────────────────────────────────── -->
+  <div id="tab-buku-tamu" class="tab-content active fade-in">
+    <div class="card">
+      <div class="section-title">Daftarkan Kehadiran Anda</div>
+      <div class="section-sub">Kehadiran Anda adalah anugerah terindah bagi kami.</div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nama Tamu</label>
+          <input type="text" id="nama" placeholder="Nama lengkap Anda" autocomplete="name" />
+        </div>
+
+        <div class="form-group full">
+          <label>Alamat Domisili</label>
+          <input type="text" id="alamat" placeholder="Kota / Kabupaten tempat tinggal" />
+        </div>
+
+        <div class="form-group">
+          <label>Nomor HP <span class="optional">(opsional)</span></label>
+          <input type="tel" id="nomor_hp" placeholder="08xx xxxx xxxx" />
+        </div>
+
+        <div class="form-group">
+          <label>Hubungan</label>
+          <select id="hubungan">
+            <option value="" disabled selected>Pilih hubungan…</option>
+            <optgroup label="Keluarga">
+              <option>Keluarga Pengantin Wanita</option>
+              <option>Keluarga Pengantin Pria</option>
+            </optgroup>
+            <optgroup label="Teman">
+              <option>Teman Pengantin Wanita</option>
+              <option>Teman Pengantin Pria</option>
+            </optgroup>
+            <optgroup label="Tetangga">
+              <option>Tetangga Pengantin Wanita</option>
+              <option>Tetangga Pengantin Pria</option>
+            </optgroup>
+            <optgroup label="Lainnya">
+              <option>Rekan Kerja</option>
+              <option>Relasi Orang Tua</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <div id="alert-buku" class="alert"></div>
+
+      <button class="btn-submit" onclick="submitBukuTamu()" id="btn-submit-buku">
+        Kirim & Tanda Tangan Buku Tamu
+      </button>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: KLAIM SOUVENIR ──────────────────────────────── -->
+  <div id="tab-klaim-souvenir" class="tab-content fade-in">
+    <div class="card">
+      <div class="section-title">Klaim Souvenir</div>
+      <div class="section-sub">Cari nama Anda untuk mengklaim souvenir pernikahan.</div>
+
+      <div class="search-wrap">
+        <input type="text" id="search-input" placeholder="Cari nama tamu…" oninput="handleSearchInput()" />
+        <button class="btn-search" onclick="searchTamu()">Cari</button>
+      </div>
+
+      <div class="stats-row" id="stats-row" style="display:none">
+        <div class="stat-chip">Total <span class="count" id="stat-total">0</span></div>
+        <div class="stat-chip">Belum Diklaim <span class="count" id="stat-belum">0</span></div>
+        <div class="stat-chip">Sudah Diklaim <span class="count" id="stat-sudah">0</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama Tamu</th>
+              <th>Alamat</th>
+              <th>Hubungan</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tamu-tbody">
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">Cari nama tamu untuk menampilkan data…</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="alert-klaim" class="alert" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ───────────────────────────────────────────────── -->
+  <footer class="fade-in">
+    <div class="footer-script">Terima Kasih</div>
+    <div class="footer-text">Atas doa dan kehadiran Anda dalam hari bahagia kami</div>
+    <div class="footer-text" style="margin-top:6px">✦ Jauhar &amp; Nita – 03 April 2026 ✦</div>
+  </footer>
+
+</div><!-- /wrapper -->
+
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   ⚙️  KONFIGURASI SUPABASE
+   Ganti nilai di bawah dengan URL dan anon key Supabase Anda.
+   ══════════════════════════════════════════════════════════════ */
+const SUPABASE_URL  = 'https://nsbfepffxyegafqjaqux.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zYmZlcGZmeHllZ2FmcWphcXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTMyOTIsImV4cCI6MjA4OTgyOTI5Mn0.i83rDUq7u2laPuvmJZayBS2AHmXq_1_-ISpGW7smmxY';
+
+/* ── Nama tabel di Supabase ─────────────────────────────────── */
+const TABLE_BUKU_TAMU = 'buku_tamu';   // ubah jika perlu
+
+/* ── Init client ────────────────────────────────────────────── */
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+/* ══════════════════════════════════════════════════════════════
+   📑 SQL untuk membuat tabel di Supabase (jalankan 1x di SQL editor)
+
+   CREATE TABLE buku_tamu (
+     id          bigserial PRIMARY KEY,
+     nama        text NOT NULL,
+     alamat      text NOT NULL,
+     nomor_hp    text,
+     hubungan    text NOT NULL,
+     status_souvenir text NOT NULL DEFAULT 'Belum Diklaim',
+     created_at  timestamptz DEFAULT now()
+   );
+
+   -- Izin baca tulis (jika RLS aktif):
+   ALTER TABLE buku_tamu ENABLE ROW LEVEL SECURITY;
+   CREATE POLICY "allow all" ON buku_tamu FOR ALL USING (true) WITH CHECK (true);
+   ══════════════════════════════════════════════════════════════ */
+
+
+/* ── Helpers ────────────────────────────────────────────────── */
+function showAlert(id, msg, type) {
+  showToast(msg, type);
+}
+
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const icon = type === 'success' ? '✦' : '✗';
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icon}</span>
+    <span class="toast-msg">${msg}</span>
+    <button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>
+  `;
+
+  container.appendChild(toast);
+
+  const timer = setTimeout(() => dismissToast(toast), 4000);
+  toast._timer = timer;
+}
+
+function dismissToast(toast) {
+  if (!toast || toast._dismissed) return;
+  toast._dismissed = true;
+  clearTimeout(toast._timer);
+  toast.classList.add('hide');
+  setTimeout(() => toast.remove(), 300);
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Menyimpan…';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = 'Kirim &amp; Tanda Tangan Buku Tamu';
+  }
+}
+
+/* ── Tab switching ──────────────────────────────────────────── */
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if (name === 'klaim-souvenir') {
+    const q = document.getElementById('search-input').value.trim();
+    if (q) searchTamu();
+    else loadAllTamu();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ✍️  SUBMIT BUKU TAMU
+   ══════════════════════════════════════════════════════════════ */
+async function submitBukuTamu() {
+  const nama     = document.getElementById('nama').value.trim();
+  const alamat   = document.getElementById('alamat').value.trim();
+  const nomor_hp = document.getElementById('nomor_hp').value.trim();
+  const hubungan = document.getElementById('hubungan').value;
+
+  if (!nama)     return showAlert('alert-buku', '⚠ Nama tamu tidak boleh kosong.', 'error');
+  if (!alamat)   return showAlert('alert-buku', '⚠ Alamat domisili tidak boleh kosong.', 'error');
+  if (!hubungan) return showAlert('alert-buku', '⚠ Silakan pilih hubungan dengan pengantin.', 'error');
+
+  setLoading('btn-submit-buku', true);
+
+  try {
+    const { error } = await db.from(TABLE_BUKU_TAMU).insert([{
+      nama,
+      alamat,
+      nomor_hp: nomor_hp || null,
+      hubungan,
+      status_souvenir: 'Belum Diklaim'
+    }]);
+
+    if (error) throw error;
+
+    showAlert('alert-buku', '✦ Terima kasih! Kehadiran Anda telah kami catat. Semoga hari ini menjadi kenangan indah.', 'success');
+
+    // Reset form
+    ['nama','alamat','nomor_hp'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('hubungan').selectedIndex = 0;
+
+  } catch (err) {
+    console.error(err);
+    showAlert('alert-buku', '✗ Gagal menyimpan data. Silakan coba lagi. (' + (err.message || '') + ')', 'error');
+  } finally {
+    setLoading('btn-submit-buku', false);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   🔍  SEARCH & DISPLAY TAMU
+   ══════════════════════════════════════════════════════════════ */
+let debounceTimer;
+function handleSearchInput() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(searchTamu, 400);
+}
+
+async function searchTamu() {
+  const q = document.getElementById('search-input').value.trim();
+
+  let query = db.from(TABLE_BUKU_TAMU).select('*').order('created_at', { ascending: false });
+  if (q) query = query.ilike('nama', `%${q}%`);
+
+  try {
+    const { data, error } = await query;
+    if (error) throw error;
+    renderTable(data || []);
+  } catch (err) {
+    console.error(err);
+    showAlert('alert-klaim', '✗ Gagal memuat data: ' + (err.message || ''), 'error');
+  }
+}
+
+async function loadAllTamu() {
+  try {
+    const { data, error } = await db
+      .from(TABLE_BUKU_TAMU)
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    renderTable(data || []);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('tamu-tbody');
+  const statsRow = document.getElementById('stats-row');
+
+  const total  = rows.length;
+  const sudah  = rows.filter(r => r.status_souvenir === 'Sudah Diklaim').length;
+  const belum  = total - sudah;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-belum').textContent = belum;
+  document.getElementById('stat-sudah').textContent = sudah;
+  statsRow.style.display = total > 0 ? 'flex' : 'none';
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">Tidak ada tamu ditemukan.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr id="row-${r.id}">
+      <td style="color:var(--text-light);font-size:.8rem">${i + 1}</td>
+      <td style="font-weight:600">${escHtml(r.nama)}</td>
+      <td style="color:var(--text-mid)">${escHtml(r.alamat)}</td>
+      <td style="color:var(--text-light);font-size:.82rem">${escHtml(r.hubungan)}</td>
+      <td>
+        <span class="badge ${r.status_souvenir === 'Sudah Diklaim' ? 'claimed' : 'unclaimed'}" id="badge-${r.id}">
+          ${r.status_souvenir === 'Sudah Diklaim' ? '✓ Sudah Diklaim' : '○ Belum Diklaim'}
+        </span>
+      </td>
+      <td>
+        <button class="btn-claim"
+          id="claimBtn-${r.id}"
+          onclick="klaimSouvenir(${r.id})"
+          ${r.status_souvenir === 'Sudah Diklaim' ? 'disabled' : ''}>
+          ${r.status_souvenir === 'Sudah Diklaim' ? 'Diklaim' : 'Klaim'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   🎁  KLAIM SOUVENIR
+   ══════════════════════════════════════════════════════════════ */
+async function klaimSouvenir(id) {
+  const btn   = document.getElementById(`claimBtn-${id}`);
+  const badge = document.getElementById(`badge-${id}`);
+
+  if (!confirm('Konfirmasi klaim souvenir untuk tamu ini?')) return;
+
+  btn.disabled = true;
+  btn.textContent = '…';
+
+  try {
+    const { error } = await db
+      .from(TABLE_BUKU_TAMU)
+      .update({ status_souvenir: 'Sudah Diklaim' })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    badge.className = 'badge claimed';
+    badge.textContent = '✓ Sudah Diklaim';
+    btn.textContent = 'Diklaim';
+
+    showAlert('alert-klaim', '✦ Souvenir berhasil diklaim!', 'success');
+
+    // refresh stats
+    searchTamu();
+
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Klaim';
+    showAlert('alert-klaim', '✗ Gagal mengklaim souvenir: ' + (err.message || ''), 'error');
+  }
+}
+
+/* ── Enter key on search ────────────────────────────────────── */
+document.getElementById('search-input')
+  .addEventListener('keydown', e => { if (e.key === 'Enter') searchTamu(); });
+</script>
+</body>
+</html>
