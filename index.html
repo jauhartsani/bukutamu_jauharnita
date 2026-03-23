@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Buku Tamu – Jauhar & Nita</title>
-  <link rel="icon" type="image/png" href="https://ik.imagekit.io/ljqggx4fn/nikah/favicon.png"> <!-- ← tambah ini -->
-
+  <link rel="icon" type="image/png" href="https://ik.imagekit.io/ljqggx4fn/nikah/favicon.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,9 +13,10 @@
 
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
-    /* ─── CSS Variables ─────────────────────────────────────── */
     :root {
       --crimson:    #3F1211;
       --cream:      #DCCEBE;
@@ -31,9 +31,7 @@
       --shadow:     rgba(63,18,17,0.15);
     }
 
-    /* ─── Reset & Base ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -44,7 +42,6 @@
       overflow-x: hidden;
     }
 
-    /* ─── Background ornament ───────────────────────────────── */
     body::before {
       content: '';
       position: fixed;
@@ -57,7 +54,6 @@
       z-index: 0;
     }
 
-    /* ─── Decorative SVG pattern overlay ───────────────────── */
     body::after {
       content: '';
       position: fixed;
@@ -67,20 +63,16 @@
       z-index: 0;
     }
 
-    /* ─── Wrapper ───────────────────────────────────────────── */
     .wrapper {
       position: relative;
       z-index: 1;
-      max-width: 780px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 0 20px 60px;
     }
 
     /* ─── Header ────────────────────────────────────────────── */
-    header {
-      text-align: center;
-      padding: 56px 20px 36px;
-    }
+    header { text-align: center; padding: 56px 20px 36px; }
 
     .header-ornament {
       font-family: 'Great Vibes', cursive;
@@ -124,9 +116,7 @@
       height: 1px;
       background: linear-gradient(to right, transparent, var(--gold));
     }
-    .header-divider::after {
-      background: linear-gradient(to left, transparent, var(--gold));
-    }
+    .header-divider::after { background: linear-gradient(to left, transparent, var(--gold)); }
 
     .divider-diamond {
       width: 8px; height: 8px;
@@ -148,7 +138,6 @@
     /* ─── Tab Nav ───────────────────────────────────────────── */
     .tab-nav {
       display: flex;
-      gap: 0;
       background: var(--cream);
       border-radius: 14px;
       padding: 5px;
@@ -178,19 +167,18 @@
       box-shadow: 0 4px 14px rgba(63,18,17,0.28);
     }
 
-    .tab-btn:not(.active):hover {
-      background: rgba(63,18,17,0.07);
-    }
+    .tab-btn:not(.active):hover { background: rgba(63,18,17,0.07); }
 
     /* ─── Card ──────────────────────────────────────────────── */
     .card {
       background: rgba(255,252,248,0.92);
       border-radius: 20px;
-      padding: clamp(28px, 5vw, 44px);
+      padding: clamp(24px, 5vw, 40px);
       box-shadow: 0 8px 40px var(--shadow), 0 1px 0 rgba(255,255,255,0.8) inset;
       border: 1px solid rgba(220,206,190,0.5);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
+      margin-bottom: 24px;
     }
 
     .section-title {
@@ -215,12 +203,7 @@
       gap: 18px;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
     .form-group.full { grid-column: 1 / -1; }
 
     label {
@@ -240,7 +223,7 @@
       margin-left: 4px;
     }
 
-    input, select, textarea {
+    input, select {
       padding: 12px 15px;
       border: 1.5px solid var(--cream-dark);
       border-radius: 10px;
@@ -254,7 +237,7 @@
       -webkit-appearance: none;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus, select:focus {
       border-color: var(--crimson);
       box-shadow: 0 0 0 3px rgba(63,18,17,0.08);
     }
@@ -269,7 +252,7 @@
       cursor: pointer;
     }
 
-    /* ─── Submit Button ─────────────────────────────────────── */
+    /* ─── Buttons ───────────────────────────────────────────── */
     .btn-submit {
       width: 100%;
       margin-top: 24px;
@@ -298,39 +281,12 @@
       pointer-events: none;
     }
 
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 28px rgba(63,18,17,0.38);
-    }
-
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(63,18,17,0.38); }
     .btn-submit:active { transform: translateY(0); }
     .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    /* ─── Alert / Toast ─────────────────────────────────────── */
-    .alert {
-      padding: 13px 18px;
-      border-radius: 10px;
-      font-size: 0.88rem;
-      margin-top: 16px;
-      display: none;
-    }
-    .alert.show { display: block; }
-    .alert.success { background: #F0EBE3; color: var(--crimson); border: 1px solid var(--gold-light); }
-    .alert.error   { background: #FDE8E8; color: #8B1A1A; border: 1px solid #F5C6C6; }
-
-    /* ─── Search bar ────────────────────────────────────────── */
-    .search-wrap {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .search-wrap input {
-      flex: 1;
-    }
-
     .btn-search {
-      padding: 12px 22px;
+      padding: 12px 20px;
       background: var(--crimson);
       color: var(--cream-light);
       border: none;
@@ -345,12 +301,41 @@
     }
     .btn-search:hover { opacity: 0.88; }
 
+    .btn-export {
+      padding: 11px 18px;
+      background: linear-gradient(135deg, #2D6B3A, #1E4D29);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      cursor: pointer;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 12px rgba(45,107,58,0.25);
+    }
+    .btn-export:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ─── Toolbar ───────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .toolbar input { flex: 1; min-width: 160px; }
+
     /* ─── Stats chips ───────────────────────────────────────── */
     .stats-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .stat-chip {
@@ -385,10 +370,7 @@
       font-size: 0.86rem;
     }
 
-    thead tr {
-      background: var(--crimson);
-      color: var(--cream-light);
-    }
+    thead tr { background: var(--crimson); color: var(--cream-light); }
 
     thead th {
       padding: 13px 14px;
@@ -444,12 +426,43 @@
       font-family: 'Lato', sans-serif;
       font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.05em;
       cursor: pointer;
       transition: opacity .2s;
     }
     .btn-claim:hover { opacity: 0.82; }
     .btn-claim:disabled { opacity: 0.35; cursor: default; }
+
+    .action-btns { display: flex; gap: 6px; }
+
+    .btn-edit {
+      padding: 5px 11px;
+      background: rgba(63,18,17,0.08);
+      color: var(--crimson);
+      border: 1px solid rgba(63,18,17,0.2);
+      border-radius: 7px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .btn-edit:hover { background: rgba(63,18,17,0.15); }
+
+    .btn-delete {
+      padding: 5px 11px;
+      background: rgba(180,30,30,0.08);
+      color: #8B1A1A;
+      border: 1px solid rgba(180,30,30,0.2);
+      border-radius: 7px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .btn-delete:hover { background: rgba(180,30,30,0.18); }
 
     .empty-state {
       text-align: center;
@@ -460,9 +473,83 @@
       font-style: italic;
     }
 
-    /* ─── Floating ornaments ────────────────────────────────── */
-    .ornament-left,
-    .ornament-right {
+    /* ─── Modal ─────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(30,8,8,0.55);
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+      animation: fadeOverlay .25s ease;
+    }
+
+    @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 36px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(30,8,8,0.3);
+      border: 1px solid rgba(220,206,190,0.5);
+      animation: modalIn .3s cubic-bezier(.21,1.02,.73,1);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--crimson);
+      margin-bottom: 20px;
+    }
+
+    .modal-form-grid { display: flex; flex-direction: column; gap: 14px; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+
+    .btn-modal-save {
+      flex: 1;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--crimson), #6B2120);
+      color: var(--cream-light);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-modal-save:hover { opacity: 0.88; }
+    .btn-modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-modal-cancel {
+      padding: 13px 20px;
+      background: var(--cream);
+      color: var(--text-mid);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-modal-cancel:hover { background: var(--cream-dark); }
+
+    /* ─── Ornaments ─────────────────────────────────────────── */
+    .ornament-left, .ornament-right {
       position: fixed;
       top: 50%;
       transform: translateY(-50%);
@@ -485,20 +572,10 @@
       border-top: 1px solid rgba(220,206,190,0.6);
     }
 
-    .footer-script {
-      font-family: 'Great Vibes', cursive;
-      color: var(--gold);
-      font-size: 1.6rem;
-      margin-bottom: 4px;
-    }
+    .footer-script { font-family: 'Great Vibes', cursive; color: var(--gold); font-size: 1.6rem; margin-bottom: 4px; }
+    .footer-text { font-size: 0.78rem; color: var(--text-light); letter-spacing: 0.06em; }
 
-    .footer-text {
-      font-size: 0.78rem;
-      color: var(--text-light);
-      letter-spacing: 0.06em;
-    }
-
-    /* ─── Loading spinner ───────────────────────────────────── */
+    /* ─── Spinner ───────────────────────────────────────────── */
     .spinner {
       display: inline-block;
       width: 16px; height: 16px;
@@ -511,27 +588,16 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── Tab content ───────────────────────────────────────── */
+    /* ─── Tabs & Animation ──────────────────────────────────── */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    /* ─── Animation ─────────────────────────────────────────── */
-    .fade-in {
-      animation: fadeIn .5s ease forwards;
-    }
+    .fade-in { animation: fadeIn .5s ease forwards; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── Responsive ────────────────────────────────────────── */
-    @media (max-width: 560px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .form-group.full { grid-column: 1; }
-      .stats-row { gap: 8px; }
-    }
-
-    /* ─── Toast Notification ─────────────────────────────────── */
+    /* ─── Toast ─────────────────────────────────────────────── */
     .toast-container {
       position: fixed;
       top: 24px;
@@ -551,7 +617,6 @@
       border-radius: 12px;
       font-family: 'Lato', sans-serif;
       font-size: 0.88rem;
-      font-weight: 400;
       color: var(--white);
       min-width: 280px;
       max-width: 360px;
@@ -560,51 +625,51 @@
       animation: toastIn .35s cubic-bezier(.21,1.02,.73,1) forwards;
     }
 
-    .toast.hide {
-      animation: toastOut .3s ease forwards;
-    }
-
+    .toast.hide { animation: toastOut .3s ease forwards; }
     .toast.success { background: linear-gradient(135deg, #3F1211, #6B2120); border-left: 4px solid var(--gold); }
     .toast.error   { background: linear-gradient(135deg, #7B1A1A, #A02020); border-left: 4px solid #F5A0A0; }
 
     .toast-icon { font-size: 1.2rem; flex-shrink: 0; }
     .toast-msg  { flex: 1; line-height: 1.4; }
     .toast-close {
-      background: none;
-      border: none;
+      background: none; border: none;
       color: rgba(255,255,255,0.5);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0;
-      flex-shrink: 0;
+      cursor: pointer; font-size: 1rem; padding: 0;
       transition: color .2s;
     }
     .toast-close:hover { color: white; }
 
     @keyframes toastIn {
       from { opacity: 0; transform: translateX(40px) scale(.95); }
-      to   { opacity: 1; transform: translateX(0)   scale(1);    }
+      to   { opacity: 1; transform: translateX(0) scale(1); }
     }
     @keyframes toastOut {
-      from { opacity: 1; transform: translateX(0)   scale(1);    }
+      from { opacity: 1; transform: translateX(0) scale(1); }
       to   { opacity: 0; transform: translateX(40px) scale(.95); }
     }
 
-    @media (max-width: 480px) {
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 580px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .toolbar { flex-direction: column; }
+      .btn-export { justify-content: center; }
       .toast-container { top: 16px; right: 12px; left: 12px; }
       .toast { min-width: unset; max-width: 100%; }
+      .modal { padding: 24px; }
+      .action-btns { flex-direction: column; gap: 4px; }
     }
   </style>
 </head>
 <body>
 
-<div class="ornament-left">J&amp;N</div>
 <div class="toast-container" id="toast-container"></div>
+<div class="ornament-left">J&amp;N</div>
 <div class="ornament-right">J&amp;N</div>
 
 <div class="wrapper">
 
-  <!-- ── HEADER ──────────────────────────────────────────────── -->
+  <!-- ── HEADER ─────────────────────────────────────────────── -->
   <header class="fade-in">
     <div class="header-ornament">✦ Selamat Datang di ✦</div>
     <div class="header-names">
@@ -615,14 +680,18 @@
     <div class="header-date">03 April 2026 &nbsp;·&nbsp; UTC Trawas</div>
   </header>
 
-  <!-- ── TABS ────────────────────────────────────────────────── -->
+  <!-- ── TABS ───────────────────────────────────────────────── -->
   <nav class="tab-nav fade-in">
-    <button class="tab-btn active" onclick="switchTab('buku-tamu')">📖 Buku Tamu</button>
-    <button class="tab-btn"        onclick="switchTab('klaim-souvenir')">🎁 Klaim Souvenir</button>
+    <button class="tab-btn active" onclick="switchTab('buku-tamu', this)">📖 Buku Tamu</button>
+    <button class="tab-btn"        onclick="switchTab('klaim-souvenir', this)">🎁 Klaim Souvenir</button>
   </nav>
 
-  <!-- ── TAB 1: BUKU TAMU ────────────────────────────────────── -->
+  <!-- ══════════════════════════════════════════════════════════
+       TAB 1 : BUKU TAMU
+  ══════════════════════════════════════════════════════════ -->
   <div id="tab-buku-tamu" class="tab-content active fade-in">
+
+    <!-- Form input tamu -->
     <div class="card">
       <div class="section-title">Daftarkan Kehadiran Anda</div>
       <div class="section-sub">Kehadiran Anda adalah anugerah terindah bagi kami.</div>
@@ -632,17 +701,14 @@
           <label>Nama Tamu</label>
           <input type="text" id="nama" placeholder="Nama lengkap Anda" autocomplete="name" />
         </div>
-
         <div class="form-group full">
           <label>Alamat Domisili</label>
           <input type="text" id="alamat" placeholder="Kota / Kabupaten tempat tinggal" />
         </div>
-
         <div class="form-group">
           <label>Nomor HP <span class="optional">(opsional)</span></label>
           <input type="tel" id="nomor_hp" placeholder="08xx xxxx xxxx" />
         </div>
-
         <div class="form-group">
           <label>Hubungan</label>
           <select id="hubungan">
@@ -667,23 +733,64 @@
         </div>
       </div>
 
-      <div id="alert-buku" class="alert"></div>
-
       <button class="btn-submit" onclick="submitBukuTamu()" id="btn-submit-buku">
-        Kirim & Tanda Tangan Buku Tamu
+        Kirim &amp; Tanda Tangan Buku Tamu
       </button>
     </div>
-  </div>
 
-  <!-- ── TAB 2: KLAIM SOUVENIR ──────────────────────────────── -->
+    <!-- Tabel daftar tamu + search + export -->
+    <div class="card">
+      <div class="section-title" style="margin-bottom:16px">Daftar Tamu Terdaftar</div>
+
+      <div class="toolbar">
+        <input type="text" id="search-buku" placeholder="Cari nama tamu…" oninput="debounceSearchBuku()" />
+        <button class="btn-search" onclick="loadBukuTamu()">Cari</button>
+        <button class="btn-export" onclick="exportExcel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Export Excel
+        </button>
+      </div>
+
+      <div class="stats-row" id="stats-row-buku" style="display:none">
+        <div class="stat-chip">Total Tamu <span class="count" id="stat-buku-total">0</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama Tamu</th>
+              <th>Alamat</th>
+              <th>No. HP</th>
+              <th>Hubungan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="buku-tbody">
+            <tr><td colspan="6"><div class="empty-state">Memuat data tamu…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /tab-buku-tamu -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       TAB 2 : KLAIM SOUVENIR
+  ══════════════════════════════════════════════════════════ -->
   <div id="tab-klaim-souvenir" class="tab-content fade-in">
     <div class="card">
       <div class="section-title">Klaim Souvenir</div>
       <div class="section-sub">Cari nama Anda untuk mengklaim souvenir pernikahan.</div>
 
-      <div class="search-wrap">
+      <div class="toolbar">
         <input type="text" id="search-input" placeholder="Cari nama tamu…" oninput="handleSearchInput()" />
         <button class="btn-search" onclick="searchTamu()">Cari</button>
+        <button class="btn-export" onclick="exportExcel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Export Excel
+        </button>
       </div>
 
       <div class="stats-row" id="stats-row" style="display:none">
@@ -700,25 +807,19 @@
               <th>Nama Tamu</th>
               <th>Alamat</th>
               <th>Hubungan</th>
-              <th>Status</th>
+              <th>Status Souvenir</th>
               <th>Aksi</th>
             </tr>
           </thead>
           <tbody id="tamu-tbody">
-            <tr>
-              <td colspan="6">
-                <div class="empty-state">Cari nama tamu untuk menampilkan data…</div>
-              </td>
-            </tr>
+            <tr><td colspan="6"><div class="empty-state">Cari nama tamu untuk menampilkan data…</div></td></tr>
           </tbody>
         </table>
       </div>
-
-      <div id="alert-klaim" class="alert" style="margin-top:16px"></div>
     </div>
-  </div>
+  </div><!-- /tab-klaim-souvenir -->
 
-  <!-- ── FOOTER ───────────────────────────────────────────────── -->
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
   <footer class="fade-in">
     <div class="footer-script">Terima Kasih</div>
     <div class="footer-text">Atas doa dan kehadiran Anda dalam hari bahagia kami</div>
@@ -727,63 +828,99 @@
 
 </div><!-- /wrapper -->
 
+<!-- ══════════════════════════════════════════════════════════════
+     MODAL EDIT
+══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-edit" style="display:none" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">✎ Edit Data Tamu</div>
+    <div class="modal-form-grid">
+      <div class="form-group">
+        <label>Nama Tamu</label>
+        <input type="text" id="modal-nama" placeholder="Nama lengkap" />
+      </div>
+      <div class="form-group">
+        <label>Alamat Domisili</label>
+        <input type="text" id="modal-alamat" placeholder="Kota / Kabupaten" />
+      </div>
+      <div class="form-group">
+        <label>Nomor HP <span class="optional">(opsional)</span></label>
+        <input type="tel" id="modal-hp" placeholder="08xx xxxx xxxx" />
+      </div>
+      <div class="form-group">
+        <label>Hubungan</label>
+        <select id="modal-hubungan">
+          <option value="" disabled>Pilih hubungan…</option>
+          <optgroup label="Keluarga">
+            <option>Keluarga Pengantin Wanita</option>
+            <option>Keluarga Pengantin Pria</option>
+          </optgroup>
+          <optgroup label="Teman">
+            <option>Teman Pengantin Wanita</option>
+            <option>Teman Pengantin Pria</option>
+          </optgroup>
+          <optgroup label="Tetangga">
+            <option>Tetangga Pengantin Wanita</option>
+            <option>Tetangga Pengantin Pria</option>
+          </optgroup>
+          <optgroup label="Lainnya">
+            <option>Rekan Kerja</option>
+            <option>Relasi Orang Tua</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <input type="hidden" id="modal-id" />
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Batal</button>
+      <button class="btn-modal-save"   onclick="saveEdit()" id="btn-modal-save">Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
 /* ══════════════════════════════════════════════════════════════
-   ⚙️  KONFIGURASI SUPABASE
-   Ganti nilai di bawah dengan URL dan anon key Supabase Anda.
+   ⚙️  KONFIGURASI SUPABASE — ganti dengan milik kamu
    ══════════════════════════════════════════════════════════════ */
 const SUPABASE_URL  = 'https://nsbfepffxyegafqjaqux.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zYmZlcGZmeHllZ2FmcWphcXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTMyOTIsImV4cCI6MjA4OTgyOTI5Mn0.i83rDUq7u2laPuvmJZayBS2AHmXq_1_-ISpGW7smmxY';
+const TABLE_BUKU_TAMU = 'buku_tamu';
 
-/* ── Nama tabel di Supabase ─────────────────────────────────── */
-const TABLE_BUKU_TAMU = 'buku_tamu';   // ubah jika perlu
-
-/* ── Init client ────────────────────────────────────────────── */
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/*
+  📑 SQL (jalankan 1x di Supabase SQL Editor):
 
-/* ══════════════════════════════════════════════════════════════
-   📑 SQL untuk membuat tabel di Supabase (jalankan 1x di SQL editor)
-
-   CREATE TABLE buku_tamu (
-     id          bigserial PRIMARY KEY,
-     nama        text NOT NULL,
-     alamat      text NOT NULL,
-     nomor_hp    text,
-     hubungan    text NOT NULL,
-     status_souvenir text NOT NULL DEFAULT 'Belum Diklaim',
-     created_at  timestamptz DEFAULT now()
-   );
-
-   -- Izin baca tulis (jika RLS aktif):
-   ALTER TABLE buku_tamu ENABLE ROW LEVEL SECURITY;
-   CREATE POLICY "allow all" ON buku_tamu FOR ALL USING (true) WITH CHECK (true);
-   ══════════════════════════════════════════════════════════════ */
+  CREATE TABLE buku_tamu (
+    id              bigserial PRIMARY KEY,
+    nama            text NOT NULL,
+    alamat          text NOT NULL,
+    nomor_hp        text,
+    hubungan        text NOT NULL,
+    status_souvenir text NOT NULL DEFAULT 'Belum Diklaim',
+    created_at      timestamptz DEFAULT now()
+  );
+  ALTER TABLE buku_tamu ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY "allow all" ON buku_tamu FOR ALL USING (true) WITH CHECK (true);
+*/
 
 
-/* ── Helpers ────────────────────────────────────────────────── */
-function showAlert(id, msg, type) {
-  showToast(msg, type);
-}
-
+/* ════════════════════════════════
+   🍞  TOAST
+════════════════════════════════ */
 function showToast(msg, type = 'success') {
   const container = document.getElementById('toast-container');
-  const icon = type === 'success' ? '✦' : '✗';
-
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
-    <span class="toast-icon">${icon}</span>
+    <span class="toast-icon">${type === 'success' ? '✦' : '✗'}</span>
     <span class="toast-msg">${msg}</span>
     <button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>
   `;
-
   container.appendChild(toast);
-
-  const timer = setTimeout(() => dismissToast(toast), 4000);
-  toast._timer = timer;
+  toast._timer = setTimeout(() => dismissToast(toast), 4000);
 }
 
 function dismissToast(toast) {
@@ -794,75 +931,232 @@ function dismissToast(toast) {
   setTimeout(() => toast.remove(), 300);
 }
 
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (loading) {
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Menyimpan…';
-  } else {
-    btn.disabled = false;
-    btn.innerHTML = 'Kirim &amp; Tanda Tangan Buku Tamu';
-  }
+
+/* ════════════════════════════════
+   🔧  HELPERS
+════════════════════════════════ */
+function escHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ── Tab switching ──────────────────────────────────────────── */
-function switchTab(name) {
+function setLoading(btnId, loading, label) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? '<span class="spinner"></span> Menyimpan…' : label;
+}
+
+
+/* ════════════════════════════════
+   🗂  TAB SWITCHING
+════════════════════════════════ */
+function switchTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
   document.getElementById(`tab-${name}`).classList.add('active');
-  event.currentTarget.classList.add('active');
+  btn.classList.add('active');
 
   if (name === 'klaim-souvenir') {
     const q = document.getElementById('search-input').value.trim();
-    if (q) searchTamu();
-    else loadAllTamu();
+    q ? searchTamu() : loadAllTamu();
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   ✍️  SUBMIT BUKU TAMU
-   ══════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════
+   ✍️  SUBMIT BUKU TAMU (INSERT)
+════════════════════════════════ */
 async function submitBukuTamu() {
   const nama     = document.getElementById('nama').value.trim();
   const alamat   = document.getElementById('alamat').value.trim();
   const nomor_hp = document.getElementById('nomor_hp').value.trim();
   const hubungan = document.getElementById('hubungan').value;
 
-  if (!nama)     return showAlert('alert-buku', '⚠ Nama tamu tidak boleh kosong.', 'error');
-  if (!alamat)   return showAlert('alert-buku', '⚠ Alamat domisili tidak boleh kosong.', 'error');
-  if (!hubungan) return showAlert('alert-buku', '⚠ Silakan pilih hubungan dengan pengantin.', 'error');
+  if (!nama)     return showToast('⚠ Nama tamu tidak boleh kosong.', 'error');
+  if (!alamat)   return showToast('⚠ Alamat domisili tidak boleh kosong.', 'error');
+  if (!hubungan) return showToast('⚠ Silakan pilih hubungan dengan pengantin.', 'error');
 
-  setLoading('btn-submit-buku', true);
+  setLoading('btn-submit-buku', true, '');
 
   try {
     const { error } = await db.from(TABLE_BUKU_TAMU).insert([{
-      nama,
-      alamat,
+      nama, alamat,
       nomor_hp: nomor_hp || null,
       hubungan,
       status_souvenir: 'Belum Diklaim'
     }]);
-
     if (error) throw error;
 
-    showAlert('alert-buku', '✦ Terima kasih! Kehadiran Anda telah kami catat. Semoga hari ini menjadi kenangan indah.', 'success');
-
-    // Reset form
+    showToast('✦ Terima kasih! Kehadiran Anda telah kami catat.', 'success');
     ['nama','alamat','nomor_hp'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('hubungan').selectedIndex = 0;
+    loadBukuTamu();
 
   } catch (err) {
     console.error(err);
-    showAlert('alert-buku', '✗ Gagal menyimpan data. Silakan coba lagi. (' + (err.message || '') + ')', 'error');
+    showToast('✗ Gagal menyimpan data. ' + (err.message || ''), 'error');
   } finally {
-    setLoading('btn-submit-buku', false);
+    setLoading('btn-submit-buku', false, 'Kirim &amp; Tanda Tangan Buku Tamu');
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   🔍  SEARCH & DISPLAY TAMU
-   ══════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════
+   📋  LOAD TABEL BUKU TAMU
+════════════════════════════════ */
+async function loadBukuTamu() {
+  const q = (document.getElementById('search-buku')?.value || '').trim();
+  let query = db.from(TABLE_BUKU_TAMU).select('*').order('created_at', { ascending: false });
+  if (q) query = query.ilike('nama', `%${q}%`);
+
+  try {
+    const { data, error } = await query;
+    if (error) throw error;
+    renderBukuTable(data || []);
+  } catch (err) {
+    showToast('✗ Gagal memuat daftar tamu: ' + (err.message || ''), 'error');
+  }
+}
+
+function renderBukuTable(rows) {
+  const tbody    = document.getElementById('buku-tbody');
+  const statsRow = document.getElementById('stats-row-buku');
+
+  document.getElementById('stat-buku-total').textContent = rows.length;
+  statsRow.style.display = rows.length > 0 ? 'flex' : 'none';
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">Belum ada tamu yang terdaftar.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr id="brow-${r.id}">
+      <td style="color:var(--text-light);font-size:.8rem">${i + 1}</td>
+      <td style="font-weight:600">${escHtml(r.nama)}</td>
+      <td style="color:var(--text-mid)">${escHtml(r.alamat)}</td>
+      <td style="color:var(--text-light);font-size:.82rem">${escHtml(r.nomor_hp || '—')}</td>
+      <td style="color:var(--text-light);font-size:.82rem">${escHtml(r.hubungan)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-edit"   onclick="openEditModal(${r.id})">✎ Edit</button>
+          <button class="btn-delete" onclick="hapusTamu(${r.id}, 'brow-${r.id}')">✕ Hapus</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+let debBukuTimer;
+function debounceSearchBuku() {
+  clearTimeout(debBukuTimer);
+  debBukuTimer = setTimeout(loadBukuTamu, 400);
+}
+
+
+/* ════════════════════════════════
+   ✎  MODAL EDIT
+════════════════════════════════ */
+async function openEditModal(id) {
+  try {
+    const { data, error } = await db.from(TABLE_BUKU_TAMU).select('*').eq('id', id).single();
+    if (error) throw error;
+
+    document.getElementById('modal-id').value     = data.id;
+    document.getElementById('modal-nama').value   = data.nama;
+    document.getElementById('modal-alamat').value = data.alamat;
+    document.getElementById('modal-hp').value     = data.nomor_hp || '';
+
+    const sel = document.getElementById('modal-hubungan');
+    for (const opt of sel.options) opt.selected = (opt.value === data.hubungan);
+
+    document.getElementById('modal-edit').style.display = 'flex';
+  } catch (err) {
+    showToast('✗ Gagal memuat data tamu: ' + (err.message || ''), 'error');
+  }
+}
+
+function closeModal() {
+  document.getElementById('modal-edit').style.display = 'none';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-edit')) closeModal();
+}
+
+async function saveEdit() {
+  const id       = document.getElementById('modal-id').value;
+  const nama     = document.getElementById('modal-nama').value.trim();
+  const alamat   = document.getElementById('modal-alamat').value.trim();
+  const nomor_hp = document.getElementById('modal-hp').value.trim();
+  const hubungan = document.getElementById('modal-hubungan').value;
+
+  if (!nama)     return showToast('⚠ Nama tidak boleh kosong.', 'error');
+  if (!alamat)   return showToast('⚠ Alamat tidak boleh kosong.', 'error');
+  if (!hubungan) return showToast('⚠ Pilih hubungan terlebih dahulu.', 'error');
+
+  const btn = document.getElementById('btn-modal-save');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Menyimpan…';
+
+  try {
+    const { error } = await db.from(TABLE_BUKU_TAMU)
+      .update({ nama, alamat, nomor_hp: nomor_hp || null, hubungan })
+      .eq('id', id);
+    if (error) throw error;
+
+    showToast('✦ Data tamu berhasil diperbarui.', 'success');
+    closeModal();
+    loadBukuTamu();
+
+    // Refresh tab klaim jika sedang aktif
+    if (document.getElementById('tab-klaim-souvenir').classList.contains('active')) {
+      loadAllTamu();
+    }
+  } catch (err) {
+    showToast('✗ Gagal menyimpan perubahan: ' + (err.message || ''), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Simpan Perubahan';
+  }
+}
+
+
+/* ════════════════════════════════
+   🗑  HAPUS TAMU
+════════════════════════════════ */
+async function hapusTamu(id, rowId) {
+  if (!confirm('Yakin ingin menghapus data tamu ini?\nTindakan ini tidak dapat dibatalkan.')) return;
+
+  try {
+    const { error } = await db.from(TABLE_BUKU_TAMU).delete().eq('id', id);
+    if (error) throw error;
+
+    const row = document.getElementById(rowId);
+    if (row) {
+      row.style.transition = 'opacity .3s, transform .3s';
+      row.style.opacity = '0';
+      row.style.transform = 'translateX(16px)';
+      setTimeout(() => { row.remove(); loadBukuTamu(); }, 320);
+    } else {
+      loadBukuTamu();
+    }
+
+    showToast('✦ Data tamu berhasil dihapus.', 'success');
+
+    if (document.getElementById('tab-klaim-souvenir').classList.contains('active')) {
+      loadAllTamu();
+    }
+  } catch (err) {
+    showToast('✗ Gagal menghapus data: ' + (err.message || ''), 'error');
+  }
+}
+
+
+/* ════════════════════════════════
+   🔍  KLAIM SOUVENIR
+════════════════════════════════ */
 let debounceTimer;
 function handleSearchInput() {
   clearTimeout(debounceTimer);
@@ -871,43 +1165,36 @@ function handleSearchInput() {
 
 async function searchTamu() {
   const q = document.getElementById('search-input').value.trim();
-
   let query = db.from(TABLE_BUKU_TAMU).select('*').order('created_at', { ascending: false });
   if (q) query = query.ilike('nama', `%${q}%`);
 
   try {
     const { data, error } = await query;
     if (error) throw error;
-    renderTable(data || []);
+    renderKlaimTable(data || []);
   } catch (err) {
-    console.error(err);
-    showAlert('alert-klaim', '✗ Gagal memuat data: ' + (err.message || ''), 'error');
+    showToast('✗ Gagal memuat data: ' + (err.message || ''), 'error');
   }
 }
 
 async function loadAllTamu() {
   try {
     const { data, error } = await db
-      .from(TABLE_BUKU_TAMU)
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from(TABLE_BUKU_TAMU).select('*').order('created_at', { ascending: false });
     if (error) throw error;
-    renderTable(data || []);
-  } catch (err) {
-    console.error(err);
-  }
+    renderKlaimTable(data || []);
+  } catch (err) { console.error(err); }
 }
 
-function renderTable(rows) {
-  const tbody = document.getElementById('tamu-tbody');
+function renderKlaimTable(rows) {
+  const tbody    = document.getElementById('tamu-tbody');
   const statsRow = document.getElementById('stats-row');
 
-  const total  = rows.length;
-  const sudah  = rows.filter(r => r.status_souvenir === 'Sudah Diklaim').length;
-  const belum  = total - sudah;
+  const total = rows.length;
+  const sudah = rows.filter(r => r.status_souvenir === 'Sudah Diklaim').length;
 
   document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-belum').textContent = belum;
+  document.getElementById('stat-belum').textContent = total - sudah;
   document.getElementById('stat-sudah').textContent = sudah;
   statsRow.style.display = total > 0 ? 'flex' : 'none';
 
@@ -928,8 +1215,7 @@ function renderTable(rows) {
         </span>
       </td>
       <td>
-        <button class="btn-claim"
-          id="claimBtn-${r.id}"
+        <button class="btn-claim" id="claimBtn-${r.id}"
           onclick="klaimSouvenir(${r.id})"
           ${r.status_souvenir === 'Sudah Diklaim' ? 'disabled' : ''}>
           ${r.status_souvenir === 'Sudah Diklaim' ? 'Diklaim' : 'Klaim'}
@@ -939,50 +1225,95 @@ function renderTable(rows) {
   `).join('');
 }
 
-function escHtml(str) {
-  return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
 
-/* ══════════════════════════════════════════════════════════════
+/* ════════════════════════════════
    🎁  KLAIM SOUVENIR
-   ══════════════════════════════════════════════════════════════ */
+════════════════════════════════ */
 async function klaimSouvenir(id) {
-  const btn   = document.getElementById(`claimBtn-${id}`);
-  const badge = document.getElementById(`badge-${id}`);
-
   if (!confirm('Konfirmasi klaim souvenir untuk tamu ini?')) return;
 
+  const btn   = document.getElementById(`claimBtn-${id}`);
+  const badge = document.getElementById(`badge-${id}`);
   btn.disabled = true;
   btn.textContent = '…';
 
   try {
-    const { error } = await db
-      .from(TABLE_BUKU_TAMU)
+    const { error } = await db.from(TABLE_BUKU_TAMU)
       .update({ status_souvenir: 'Sudah Diklaim' })
       .eq('id', id);
-
     if (error) throw error;
 
-    badge.className = 'badge claimed';
+    badge.className   = 'badge claimed';
     badge.textContent = '✓ Sudah Diklaim';
-    btn.textContent = 'Diklaim';
+    btn.textContent   = 'Diklaim';
 
-    showAlert('alert-klaim', '✦ Souvenir berhasil diklaim!', 'success');
-
-    // refresh stats
+    showToast('✦ Souvenir berhasil diklaim!', 'success');
     searchTamu();
 
   } catch (err) {
-    console.error(err);
     btn.disabled = false;
     btn.textContent = 'Klaim';
-    showAlert('alert-klaim', '✗ Gagal mengklaim souvenir: ' + (err.message || ''), 'error');
+    showToast('✗ Gagal mengklaim souvenir: ' + (err.message || ''), 'error');
   }
 }
 
-/* ── Enter key on search ────────────────────────────────────── */
-document.getElementById('search-input')
-  .addEventListener('keydown', e => { if (e.key === 'Enter') searchTamu(); });
+
+/* ════════════════════════════════
+   📊  EXPORT EXCEL
+════════════════════════════════ */
+async function exportExcel() {
+  showToast('Menyiapkan file Excel…', 'success');
+
+  try {
+    const { data, error } = await db
+      .from(TABLE_BUKU_TAMU).select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      return showToast('⚠ Belum ada data untuk diekspor.', 'error');
+    }
+
+    const rows = data.map((r, i) => ({
+      'No':              i + 1,
+      'Nama Tamu':       r.nama,
+      'Alamat Domisili': r.alamat,
+      'Nomor HP':        r.nomor_hp || '',
+      'Hubungan':        r.hubungan,
+      'Status Souvenir': r.status_souvenir,
+      'Waktu Daftar':    r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : ''
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [
+      { wch: 5 }, { wch: 28 }, { wch: 24 }, { wch: 18 },
+      { wch: 30 }, { wch: 18 }, { wch: 22 }
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Buku Tamu');
+
+    const tanggal = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `BukuTamu_JauharNita_${tanggal}.xlsx`);
+
+    showToast('✦ File Excel berhasil diunduh!', 'success');
+
+  } catch (err) {
+    showToast('✗ Gagal export Excel: ' + (err.message || ''), 'error');
+  }
+}
+
+
+/* ════════════════════════════════
+   🚀  INIT
+════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadBukuTamu();
+
+  document.getElementById('search-buku')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') loadBukuTamu(); });
+  document.getElementById('search-input')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') searchTamu(); });
+});
 </script>
 </body>
 </html>
